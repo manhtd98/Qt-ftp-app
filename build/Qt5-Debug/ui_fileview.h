@@ -120,6 +120,10 @@ public:
 
         listWidget = new QListWidget(verticalLayoutWidget);
         listWidget->setObjectName(QString::fromUtf8("listWidget"));
+        listWidget->setMinimumSize(QSize(15, 15));
+        listWidget->setBaseSize(QSize(15, 15));
+        listWidget->setLineWidth(3);
+        listWidget->setIconSize(QSize(10, 10));
 
         verticalLayout->addWidget(listWidget);
 

@@ -9,28 +9,25 @@
 
 #define BUFFER_SIZE     8192
 
+
 class ftpClient
 {
 public:
     ftpClient();
     void sendCommand(QTcpSocket &socket, const QString &command);
-    int FTPConnect();
+    int FTPConnect(QString serverIp,  int port, QString username, QString password );
     QString receiveResponse(QTcpSocket &socket);
-    QTcpSocket* openDataConnection(QTcpSocket &socket);
-    void downloadFile(QTcpSocket &controlSocket, const QString localFilePath, const QString remoteFileName);
-    void uploadFile(QTcpSocket &controlSocket, const QString localFilePath, const QString remoteFileName);
-    QStringList ListDir(QTcpSocket &controlSocket, QString tempDir);
+    QTcpSocket* openDataConnection();
+    void downloadFile(const QString localFilePath, const QString remoteFileName);
+    void uploadFile(const QString localFilePath, const QString remoteFileName);
+    QPair<QStringList, QStringList> ListDir(QString tempDir);
 
 
 private:
     QString server_addr;
     QString user, pass;
-    int data_port = 0;
-    QString data_ip;
-    QString cur_status = QString();
-    QString cur_mode = "IDLE";
-    QTcpSocket* command_socket = new QTcpSocket();
-    QTcpSocket* data_socket = new QTcpSocket();
+    int server_port = 21;
+    QTcpSocket controlSocket;
 };
 
 #endif // FTPCLIENT_H

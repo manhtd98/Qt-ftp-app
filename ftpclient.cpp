@@ -7,14 +7,7 @@ ftpClient::ftpClient() {
 
 }
 
-int ftpClient::FTPConnect(){
-
-    QString serverIp = "127.0.0.1";
-    int port = 21;
-    QString username = "macbook";
-    QString password = "11235";
-
-    QTcpSocket controlSocket;
+int ftpClient::FTPConnect(QString serverIp,  int port, QString username, QString password ){
     controlSocket.connectToHost(serverIp, port);
     if (!controlSocket.waitForConnected()) {
         qWarning() << "Error: Unable to connect to server";
@@ -32,18 +25,23 @@ int ftpClient::FTPConnect(){
 
     qDebug() << receiveResponse(controlSocket);
     sendCommand(controlSocket, "PASS " + password + "\r\n");
-    qDebug() << receiveResponse(controlSocket);
-
-    ListDir(controlSocket, "/Users/macbook/main/");
-    // Upload a file
-    uploadFile(controlSocket, "/Users/macbook/Desktop/3.txt", "/Users/macbook/main/1.txt");
-
-    // Download a file
-    downloadFile(controlSocket, "/Users/macbook/Desktop/4.txt", "/Users/macbook/main/1.txt");
-
-
-
+    QString loginResponse = receiveResponse(controlSocket);
+    qDebug()<< loginResponse;
+    if(loginResponse.contains("230")){
+        return 1;
+    }
     controlSocket.close();
+    return -1;
+    // ListDir(controlSocket, "/Users/macbook/main/");
+    // // Upload a file
+    // uploadFile(controlSocket, "/Users/macbook/Desktop/3.txt", "/Users/macbook/main/5.txt");
+
+    // // Download a file
+    // downloadFile(controlSocket, "/Users/macbook/Desktop/4.txt", "/Users/macbook/main/5.txt");
+
+
+
+
 }
 void ftpClient::sendCommand(QTcpSocket &socket, const QString &command)
 {
@@ -58,14 +56,14 @@ QString ftpClient::receiveResponse(QTcpSocket &socket) {
     return QString::fromUtf8(socket.readLine());
 }
 
-QStringList ftpClient::ListDir(QTcpSocket& controlSocket, QString tempDir)
+QPair<QStringList, QStringList> ftpClient::ListDir(QString tempDir)
 {
-    QTcpSocket * dataSocket = openDataConnection(controlSocket);
+    QTcpSocket * dataSocket = openDataConnection();
     if (!dataSocket) {
-        return QStringList();
+        return qMakePair(QStringList(), QStringList());
     }
 
-    qDebug() << "Sending LIST command...";
+    qDebug() << "Sending LIST command..." << tempDir;
     sendCommand(controlSocket, "LIST "+ tempDir + "\r\n");
     qDebug() << receiveResponse(controlSocket);
 
@@ -82,21 +80,26 @@ QStringList ftpClient::ListDir(QTcpSocket& controlSocket, QString tempDir)
 
 
     QList<QString> fileList;
+    QList<QString> isDirList;
     QStringList lines = dirListing.split("\n", QString::SkipEmptyParts);
+    qDebug()<< dirListing;
     foreach (const QString &line, lines) {
         if (regex.indexIn(line) != -1) {
             // QString permissions = regex.cap(1);
             // QString fileSize = regex.cap(5);
             QString fileName = regex.cap(7);
+            fileName.chop(1);
             fileList.append(fileName);
+            isDirList.append(line[0]);
+
         }
     }
 
     qDebug()<<fileList;
-    return fileList;
+    return qMakePair(fileList, isDirList);
 }
 
-QTcpSocket* ftpClient::openDataConnection(QTcpSocket &controlSocket)
+QTcpSocket* ftpClient::openDataConnection()
 {
     qDebug()<<"Entering PASV mode";
     sendCommand(controlSocket, "PASV\r\n");
@@ -135,8 +138,8 @@ QTcpSocket* ftpClient::openDataConnection(QTcpSocket &controlSocket)
     return dataSocket;
 }
 
-void ftpClient::downloadFile(QTcpSocket &controlSocket, const QString localFilePath, const QString remoteFilename) {
-    QTcpSocket *dataSocket = openDataConnection(controlSocket);
+void ftpClient::downloadFile(const QString localFilePath, const QString remoteFilename) {
+    QTcpSocket *dataSocket = openDataConnection();
     if (!dataSocket) {
         return;
     }
@@ -159,9 +162,9 @@ void ftpClient::downloadFile(QTcpSocket &controlSocket, const QString localFileP
     delete dataSocket;
 }
 
-void ftpClient::uploadFile(QTcpSocket &controlSocket,  const QString localFilePath, const QString remoteFileName)
+void ftpClient::uploadFile(const QString localFilePath, const QString remoteFileName)
 {
-    QTcpSocket *dataSocket = openDataConnection(controlSocket);
+    QTcpSocket *dataSocket = openDataConnection();
     if (!dataSocket) {
         return ;
     }
@@ -194,22 +197,21 @@ void ftpClient::uploadFile(QTcpSocket &controlSocket,  const QString localFilePa
     }
     while (!inFile.atEnd()) {
         QByteArray buffer = inFile.read(1024);
+        qDebug()<<buffer;
         qint64 bytesWritten = dataSocket->write(buffer);
+        qDebug()<<bytesWritten;
         if (bytesWritten == -1) {
             qWarning() << "Error: Write to data socket failed";
             break;
         }
 
-        if (!dataSocket->waitForBytesWritten(5000)) { // Added timeout
-            qWarning() << "Error: Timeout while waiting for data to be written";
-            break;
-        }
+        // if (!dataSocket->waitForBytesWritten(5000)) { // Added timeout
+        //     qWarning() << "Error: Timeout while waiting for data to be written";
+        //     break;
+        // }
     }
     dataSocket->waitForBytesWritten();
     inFile.close();
-
-    qDebug() << receiveResponse(controlSocket);
-
     dataSocket->close();
     delete dataSocket;
 }

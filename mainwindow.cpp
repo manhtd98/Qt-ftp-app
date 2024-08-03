@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QtNetwork/QNetworkAccessManager>
 #include <QNetworkReply>
-
+#include <QRegExp>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,6 +16,24 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+QString extractHostFromFtpUrl(const QString &url) {
+    QRegularExpression regex(R"(^ftp:\/\/([^\/:]+))"); // Regex to capture the host part
+    QRegularExpressionMatch match = regex.match(url);
+    if (match.hasMatch()) {
+        return match.captured(1); // Return the captured host
+    }
+    return QString(); // Return empty if no match
+}
+QString extractIpAddress(const QString &input) {
+    QRegularExpression regex(R"((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))");
+    QRegularExpressionMatch match = regex.match(input);
+    if (match.hasMatch()) {
+        return match.captured(1); // Return the captured IP address
+    }
+    return QString(); // Return empty if no match
+}
+
 void MainWindow::on_pushButton_clicked()
 {
     line1=ui->lineEdit->text();
@@ -23,53 +41,51 @@ void MainWindow::on_pushButton_clicked()
     line3=ui->lineEdit_3->text();
     line4=ui->lineEdit_4->text().toInt();
     bool valid=true;
+
     if(line1.length()==0){
         valid=false;
-        ui->lineEdit->setPlaceholderText("Vui lòng nhập URL Server");
-    }else if (!line1.startsWith("ftp:/")){
-        valid=false;
-        ui->lineEdit->clear();
-        ui->lineEdit->setPlaceholderText("Địa chỉ Protocol không chính xác");
+        ui->lineEdit->setPlaceholderText("Please type URL Server");
+    }else{
+        QString extractFTPURL = extractHostFromFtpUrl(line1);
+        QString extractIpURL = extractIpAddress(line1);
+        if(!(extractFTPURL.size() or extractIpURL.size())){
+            valid=false;
+            ui->lineEdit->clear();
+            ui->lineEdit->setPlaceholderText("FTP URL not valid, please check it");
+        }else{
+            if(extractFTPURL.size())line1 = extractFTPURL;
+            else line1 = extractIpURL;
+        }
     }
-    if (!line1.endsWith("/")){
-        line1 += "/";
+    if (line1.endsWith("/")){
+        line1.chop(1);
     }
 
     if(line2.length()==0){
         valid=false;
-        ui->lineEdit_2->setPlaceholderText("Vui lòng nhập username");
+        ui->lineEdit_2->setPlaceholderText("Please type valid username");
     }
     if(line3.length()==0){
         valid=false;
-        ui->lineEdit_3->setPlaceholderText("Vui lòng nhập mật khẩu");
+        ui->lineEdit_3->setPlaceholderText("Please type valid password");
     }
     if(line4==0){
         valid=false;
-        ui->lineEdit_4->setPlaceholderText("Vui lòng nhập port");
+        ui->lineEdit_4->setPlaceholderText("Please type port");
     }
     if(valid){
-        QDataStream;
-
-
         ui->pushButton->setText("Connecting");
-        QUrl FTPClient(line1);
-        FTPClient.setUserName(line2);
-        FTPClient.setPassword(line3);
-        FTPClient.setPort(line4);
-        QNetworkAccessManager *qnetwork = new QNetworkAccessManager();
-        qreply = qnetwork->get(QNetworkRequest(FTPClient));
-        QObject::connect(qreply, &QNetworkReply::finished, this, &MainWindow::connectFTP);
-    }
-}
-void MainWindow::connectFTP(){
-    if((qreply->error()==QNetworkReply::ContentOperationNotPermittedError) or (qreply->error()==QNetworkReply::NoError)){
-        ui->pushButton->setText("Connected");
-        FileView *fileView = new FileView(line1, line2, line3, line4);
-        fileView->show();
-        this->hide();
-    }else{
-        ui->pushButton->setText("Disconnected");
-        qDebug()<< "Error:" << qreply->errorString();
+        ftpClient ftp;
+        int login_Response = ftp.FTPConnect(line1, line4, line2, line3);
+        if(login_Response!=-1){
+            ui->pushButton->setText("Connected");
+            FileView *fileView = new FileView(line1, line2, line3, line4);
+            fileView->show();
+            this->hide();
+
+        }else{
+            ui->pushButton->setText("Failed");
+        }
     }
 }
 

@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QListWidgetItem>
+#include "ftpclient.h"
 
 namespace Ui {
 class FileView;
@@ -20,25 +21,21 @@ public:
 
 private slots:
     void on_pushButton_2_clicked();
-
     void on_pushButton_clicked();
-    void getFileList();
-    void uploadFileListUpdate();
     void on_pushButton_3_clicked();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
+    void getFileList();
 
 private:
     Ui::FileView *ui;
-    QNetworkAccessManager* qmanager;
-
     QString ftpAddress;
     int ftpPort;
     QString username;
     QString password;
-
+    ftpClient FtpClient;
     QStringList fileList;
-    QString uploadFileName;
-    QString downloadFileName;
+    QString dirPath = QString();
+
 
 };
 

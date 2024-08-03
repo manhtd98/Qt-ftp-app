@@ -122,13 +122,13 @@ public:
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "FPT Server", nullptr));
-        lineEdit->setText(QCoreApplication::translate("MainWindow", "ftp://localhost/Users/macbook/main", nullptr));
+        lineEdit->setText(QCoreApplication::translate("MainWindow", "ftp://127.0.0.1", nullptr));
         lineEdit->setPlaceholderText(QCoreApplication::translate("MainWindow", "ftp://example/", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "Username", nullptr));
-        lineEdit_2->setText(QCoreApplication::translate("MainWindow", "test", nullptr));
+        lineEdit_2->setText(QCoreApplication::translate("MainWindow", "macbook", nullptr));
         lineEdit_2->setPlaceholderText(QCoreApplication::translate("MainWindow", "username", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "Password", nullptr));
-        lineEdit_3->setText(QCoreApplication::translate("MainWindow", "123456", nullptr));
+        lineEdit_3->setText(QCoreApplication::translate("MainWindow", "11235", nullptr));
         lineEdit_3->setPlaceholderText(QCoreApplication::translate("MainWindow", "password", nullptr));
         label_4->setText(QCoreApplication::translate("MainWindow", "Port", nullptr));
         lineEdit_4->setText(QCoreApplication::translate("MainWindow", "21", nullptr));

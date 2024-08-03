@@ -12,7 +12,8 @@ SOURCES += \
     fileview.cpp \
     ftpclient.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    test_ftpclient.cpp
 
 HEADERS += \
     fileview.h \

@@ -55,12 +55,14 @@ OBJECTS_DIR   = ./
 SOURCES       = ../../fileview.cpp \
 		../../ftpclient.cpp \
 		../../main.cpp \
-		../../mainwindow.cpp moc_fileview.cpp \
+		../../mainwindow.cpp \
+		../../test_ftpclient.cpp moc_fileview.cpp \
 		moc_mainwindow.cpp
 OBJECTS       = fileview.o \
 		ftpclient.o \
 		main.o \
 		mainwindow.o \
+		test_ftpclient.o \
 		moc_fileview.o \
 		moc_mainwindow.o
 DIST          = /opt/homebrew/Cellar/qt@5/5.15.13_1/mkspecs/features/spec_pre.prf \
@@ -281,7 +283,8 @@ DIST          = /opt/homebrew/Cellar/qt@5/5.15.13_1/mkspecs/features/spec_pre.pr
 		../../mainwindow.h ../../fileview.cpp \
 		../../ftpclient.cpp \
 		../../main.cpp \
-		../../mainwindow.cpp
+		../../mainwindow.cpp \
+		../../test_ftpclient.cpp
 QMAKE_TARGET  = untitled
 DESTDIR       = 
 TARGET        = untitled.app/Contents/MacOS/untitled
@@ -774,7 +777,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/homebrew/Cellar/qt@5/5.15.13_1/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../fileview.h ../../ftpclient.h ../../mainwindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../fileview.cpp ../../ftpclient.cpp ../../main.cpp ../../mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../fileview.cpp ../../ftpclient.cpp ../../main.cpp ../../mainwindow.cpp ../../test_ftpclient.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../fileview.ui ../../mainwindow.ui $(DISTDIR)/
 
 
@@ -1027,6 +1030,14 @@ mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		/opt/homebrew/Cellar/qt@5/5.15.13_1/lib/QtNetwork.framework/Headers/QNetworkReply \
 		/opt/homebrew/Cellar/qt@5/5.15.13_1/lib/QtNetwork.framework/Headers/qnetworkreply.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../../mainwindow.cpp
+
+test_ftpclient.o: ../../test_ftpclient.cpp /opt/homebrew/Cellar/qt@5/5.15.13_1/lib/QtNetwork.framework/Headers/QTcpSocket \
+		/opt/homebrew/Cellar/qt@5/5.15.13_1/lib/QtNetwork.framework/Headers/qtcpsocket.h \
+		/opt/homebrew/Cellar/qt@5/5.15.13_1/lib/QtCore.framework/Headers/QFile \
+		/opt/homebrew/Cellar/qt@5/5.15.13_1/lib/QtCore.framework/Headers/qfile.h \
+		/opt/homebrew/Cellar/qt@5/5.15.13_1/lib/QtCore.framework/Headers/QRegExp \
+		/opt/homebrew/Cellar/qt@5/5.15.13_1/lib/QtCore.framework/Headers/qregexp.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o test_ftpclient.o ../../test_ftpclient.cpp
 
 moc_fileview.o: moc_fileview.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_fileview.o moc_fileview.cpp

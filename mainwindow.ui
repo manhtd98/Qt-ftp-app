@@ -39,7 +39,7 @@
      <item>
       <widget class="QLineEdit" name="lineEdit">
        <property name="text">
-        <string>ftp://localhost/Users/macbook/main</string>
+        <string>ftp://127.0.0.1</string>
        </property>
        <property name="placeholderText">
         <string>ftp://example/</string>
@@ -61,7 +61,7 @@
      <item>
       <widget class="QLineEdit" name="lineEdit_2">
        <property name="text">
-        <string>test</string>
+        <string>macbook</string>
        </property>
        <property name="placeholderText">
         <string>username</string>
@@ -83,7 +83,7 @@
      <item>
       <widget class="QLineEdit" name="lineEdit_3">
        <property name="text">
-        <string>123456</string>
+        <string>11235</string>
        </property>
        <property name="placeholderText">
         <string>password</string>

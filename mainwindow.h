@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include "fileview.h"
-
+#include "ftpclient.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -21,8 +21,6 @@ public:
 
 private slots:
     void on_pushButton_clicked();
-    void connectFTP();
-
 
 private:
     Ui::MainWindow *ui;
@@ -30,6 +28,5 @@ private:
     QString line2;
     QString line3;
     int line4;
-    QNetworkReply *qreply;
 };
 #endif // MAINWINDOW_H
