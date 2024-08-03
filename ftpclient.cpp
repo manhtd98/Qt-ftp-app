@@ -82,11 +82,8 @@ QPair<QStringList, QStringList> ftpClient::ListDir(QString tempDir)
     QList<QString> fileList;
     QList<QString> isDirList;
     QStringList lines = dirListing.split("\n", QString::SkipEmptyParts);
-    qDebug()<< dirListing;
     foreach (const QString &line, lines) {
         if (regex.indexIn(line) != -1) {
-            // QString permissions = regex.cap(1);
-            // QString fileSize = regex.cap(5);
             QString fileName = regex.cap(7);
             fileName.chop(1);
             fileList.append(fileName);
@@ -197,7 +194,6 @@ void ftpClient::uploadFile(const QString localFilePath, const QString remoteFile
     }
     while (!inFile.atEnd()) {
         QByteArray buffer = inFile.read(1024);
-        qDebug()<<buffer;
         qint64 bytesWritten = dataSocket->write(buffer);
         qDebug()<<bytesWritten;
         if (bytesWritten == -1) {
@@ -205,10 +201,6 @@ void ftpClient::uploadFile(const QString localFilePath, const QString remoteFile
             break;
         }
 
-        // if (!dataSocket->waitForBytesWritten(5000)) { // Added timeout
-        //     qWarning() << "Error: Timeout while waiting for data to be written";
-        //     break;
-        // }
     }
     dataSocket->waitForBytesWritten();
     inFile.close();
