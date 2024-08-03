@@ -15,7 +15,6 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
-#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
@@ -33,7 +32,6 @@ public:
     QLineEdit *lineEdit;
     QPushButton *pushButton_2;
     QPushButton *pushButton;
-    QProgressBar *progressBar;
     QLabel *label_3;
     QHBoxLayout *horizontalLayout;
     QLineEdit *lineEdit_2;
@@ -84,12 +82,6 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_2);
 
-        progressBar = new QProgressBar(verticalLayoutWidget);
-        progressBar->setObjectName(QString::fromUtf8("progressBar"));
-        progressBar->setValue(24);
-
-        verticalLayout->addWidget(progressBar);
-
         label_3 = new QLabel(verticalLayoutWidget);
         label_3->setObjectName(QString::fromUtf8("label_3"));
 
@@ -137,7 +129,7 @@ public:
     {
         FileView->setWindowTitle(QCoreApplication::translate("FileView", "Form", nullptr));
         label_4->setText(QString());
-        label_2->setText(QCoreApplication::translate("FileView", "Upload file:", nullptr));
+        label_2->setText(QCoreApplication::translate("FileView", "Upload file", nullptr));
         pushButton_2->setText(QCoreApplication::translate("FileView", "Choose file", nullptr));
         pushButton->setText(QCoreApplication::translate("FileView", "Upload", nullptr));
         label_3->setText(QCoreApplication::translate("FileView", "Download file", nullptr));

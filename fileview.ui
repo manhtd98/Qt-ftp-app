@@ -39,7 +39,7 @@
     <item>
      <widget class="QLabel" name="label_2">
       <property name="text">
-       <string>Upload file:</string>
+       <string>Upload file</string>
       </property>
      </widget>
     </item>
@@ -73,13 +73,6 @@
        </widget>
       </item>
      </layout>
-    </item>
-    <item>
-     <widget class="QProgressBar" name="progressBar">
-      <property name="value">
-       <number>24</number>
-      </property>
-     </widget>
     </item>
     <item>
      <widget class="QLabel" name="label_3">
