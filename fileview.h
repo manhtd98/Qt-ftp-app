@@ -42,6 +42,8 @@ private:
     ftpClient FtpClient;
     QStringList fileList;
     QString dirPath = QString();
+    QIcon fileIcon;
+    QIcon dirIcon;
 };
 
 #endif // FILEVIEW_H

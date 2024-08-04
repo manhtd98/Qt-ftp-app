@@ -15,10 +15,14 @@ FileView::FileView(QString ftpHost, QString ftpUser, QString ftpPass, int ftppor
     ftpPort = ftpport;
     username = ftpUser;
     password = ftpPass;
+    QIcon fileIcon_item(":/icons/file.png");
+    QIcon dirIcon_tem(":/icons/folder.png");
+    fileIcon = fileIcon_item;
+    dirIcon = dirIcon_tem;
     ui->setupUi(this);
     ui->listWidget->clear();
 
-    qDebug()<< ftpAddress<< ftpPort<< username<< password;
+    qDebug() << "Connecting to" << ftpAddress << ftpPort << username << password;
     FtpClient.FTPConnect(ftpAddress, ftpPort, username, password);
 
     getFileList();
@@ -55,8 +59,7 @@ void FileView::getFileList()
     QStringList fileList=res.first;
     QStringList isDirList = res.second;
     ui->listWidget->clear();
-    QIcon fileIcon(":/icons/file.png");
-    QIcon dirIcon(":/icons/folder.png");
+
     QListWidgetItem *item = new QListWidgetItem();
     item->setText("...");
     item->setSizeHint(QSize(ui->listWidget->width(), 30));
