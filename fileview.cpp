@@ -54,13 +54,12 @@ void FileView::getFileList()
     QStringList fileList=res.first;
     QStringList isDirList = res.second;
     ui->listWidget->clear();
-    // QIcon fileIcon(":/icons/file.png");
-    QIcon dirIcon("://*folder*/.png");
+    QIcon fileIcon(":/icons/file.png");
+    QIcon dirIcon(":/icons/folder.png");
     QListWidgetItem *item = new QListWidgetItem();
     item->setText("...");
     item->setSizeHint(QSize(ui->listWidget->width(), 30));
     item->setTextAlignment(Qt::AlignLeft);
-    item -> setBackground(Qt::green);
     item->setTextAlignment(Qt::AlignVCenter);
 
     ui->listWidget->addItem(item);
@@ -70,17 +69,21 @@ void FileView::getFileList()
         {
             if (fileList.at(i) != "")
             {
-                QListWidgetItem *item = new QListWidgetItem(dirIcon, fileList.at(i));
+                QListWidgetItem *item = new QListWidgetItem();
+
                 item->setForeground(Qt::white);
                 item->setTextAlignment(Qt::AlignLeft);
                 item->setData(Qt::UserRole, QVariant(isDirList.at(i)));
                 item->setSizeHint(QSize(ui->listWidget->width(), 30));
-                // item->setTextAlignment(Qt::AlignCenter);
+                item->setText(fileList.at(i));
+                if (isDirList.at(i) == "d") {
+                    item->setIcon(dirIcon);
+                    item->setBackground(Qt::blue);
+                } else {
+                    item->setIcon(fileIcon);
+                }
                 item->setTextAlignment(Qt::AlignVCenter);
                 ui->listWidget->addItem(item);
-                if(isDirList.at(i)=="d"){
-                    item -> setBackground(Qt::blue);
-                }
             }
         }
     }

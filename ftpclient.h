@@ -14,6 +14,7 @@ class ftpClient
 {
 public:
     ftpClient();
+    ~ftpClient();
     void sendCommand(QTcpSocket &socket, const QString &command);
     int FTPConnect(QString serverIp,  int port, QString username, QString password );
     QString receiveResponse(QTcpSocket &socket);
@@ -24,7 +25,6 @@ public:
     void addDir(QString tempDir);
     void removeDir(QString dirPath);
     void removeFile(QString filePath);
-
 
 private:
     QString server_addr;

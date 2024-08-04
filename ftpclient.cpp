@@ -6,6 +6,10 @@
 ftpClient::ftpClient() {
     
 }
+ftpClient::~ftpClient()
+{
+    controlSocket.close();
+};
 
 int ftpClient::FTPConnect(QString serverIp,  int port, QString username, QString password ){
     controlSocket.connectToHost(serverIp, port);
