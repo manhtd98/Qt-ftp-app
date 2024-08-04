@@ -17,7 +17,9 @@ FileView::FileView(QString ftpHost, QString ftpUser, QString ftpPass, int ftppor
     password = ftpPass;
     QIcon fileIcon_item(":/icons/file.png");
     QIcon dirIcon_tem(":/icons/folder.png");
+    QColor customDirColor_item(100, 130, 173);
     fileIcon = fileIcon_item;
+    customDirColor = customDirColor_item;
     dirIcon = dirIcon_tem;
     ui->setupUi(this);
     ui->listWidget->clear();
@@ -55,24 +57,28 @@ void FileView::on_pushButton_clicked()
 
 void FileView::getFileList()
 {
+    // Update the file list window
     QPair<QStringList, QStringList> res = FtpClient.ListDir(dirPath);
     QStringList fileList=res.first;
     QStringList isDirList = res.second;
     ui->listWidget->clear();
-    QColor customDirColor(100, 130, 173);
-    QListWidgetItem *item = new QListWidgetItem();
-    item->setText("...");
-    item->setSizeHint(QSize(ui->listWidget->width(), 30));
-    item->setTextAlignment(Qt::AlignLeft);
-    item->setTextAlignment(Qt::AlignVCenter);
-
-    ui->listWidget->addItem(item);
+    qDebug() << dirPath.split("/").size();
+    if (dirPath.split("/").size() > 1) {
+        // Add the ... to return previous folder
+        QListWidgetItem *item = new QListWidgetItem();
+        item->setText("...");
+        item->setSizeHint(QSize(ui->listWidget->width(), 30));
+        item->setTextAlignment(Qt::AlignLeft);
+        item->setTextAlignment(Qt::AlignVCenter);
+        ui->listWidget->addItem(item);
+    }
 
     if (fileList.size() > 0) {
         for (int i = 0; i < fileList.size(); i++)
         {
             if (fileList.at(i) != "")
             {
+                // Add new item to list view
                 QListWidgetItem *item = new QListWidgetItem();
 
                 item->setForeground(Qt::white);
@@ -97,7 +103,8 @@ void FileView::getFileList()
 void FileView::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
     if (item->text() == "...") {
-        if(dirPath.split("/").size()>0){
+        // go to previous folder
+        if (dirPath.split("/").size() > 1) {
             QStringList item = dirPath.split("/");
             item.removeLast();
             dirPath = item.join("/");
@@ -105,10 +112,11 @@ void FileView::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
         }
     } else {
         if(item->data(Qt::UserRole)=="d"){
+            // go to the folder
             dirPath += "/"+item->text();
             getFileList();
         }else{
-            // Download file here
+            // Download file
             QString downloadPath = ui->lineEdit_2->text();
             if (downloadPath.isEmpty()){
                 QMessageBox::information(
@@ -165,15 +173,21 @@ void FileView::on_addDir_clicked()
 void FileView::on_removeItem_clicked()
 {
     QList<QListWidgetItem *> selectedItem = ui->listWidget->selectedItems();
-    for (int i = 0; i < selectedItem.size(); i++) {
-        if (selectedItem.at(i)->data(Qt::UserRole) == "d") {
-            FtpClient.removeDir(dirPath + "/" + selectedItem.at(i)->text());
+    if (selectedItem.size() > 0) {
+        for (int i = 0; i < selectedItem.size(); i++) {
+            if (selectedItem.at(i)->data(Qt::UserRole) == "d") {
+                FtpClient.removeDir(dirPath + "/" + selectedItem.at(i)->text());
 
-        } else {
-            FtpClient.removeFile(dirPath + "/" + selectedItem.at(i)->text());
+            } else {
+                FtpClient.removeFile(dirPath + "/" + selectedItem.at(i)->text());
+            }
         }
+        getFileList();
+    } else {
+        QMessageBox::information(nullptr,
+                                 "Remove file or folder",
+                                 "Please choose remove file/folder");
     }
-    getFileList();
 }
 
 void FileView::on_disconnectButton_clicked()

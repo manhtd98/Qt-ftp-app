@@ -44,6 +44,7 @@ private:
     QString dirPath = QString();
     QIcon fileIcon;
     QIcon dirIcon;
+    QColor customDirColor;
 };
 
 #endif // FILEVIEW_H
