@@ -19,7 +19,7 @@ MainWindow::~MainWindow()
 
 
 QString extractHostFromFtpUrl(const QString &url) {
-    QRegularExpression regex(R"(^ftp:\/\/([^\/:]+))"); // Regex to capture the host part
+    static QRegularExpression regex(R"(^ftp:\/\/([^\/:]+))"); // Regex to capture the host part
     QRegularExpressionMatch match = regex.match(url);
     if (match.hasMatch()) {
         return match.captured(1); // Return the captured host
@@ -27,7 +27,7 @@ QString extractHostFromFtpUrl(const QString &url) {
     return QString(); // Return empty if no match
 }
 QString extractIpAddress(const QString &input) {
-    QRegularExpression regex(R"((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))");
+    static QRegularExpression regex(R"((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}))");
     QRegularExpressionMatch match = regex.match(input);
     if (match.hasMatch()) {
         return match.captured(1); // Return the captured IP address
