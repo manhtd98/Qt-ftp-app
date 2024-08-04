@@ -28,5 +28,6 @@ private:
     QString line2;
     QString line3;
     int line4;
+    FileView *fileView;
 };
 #endif // MAINWINDOW_H

@@ -18,13 +18,20 @@ class FileView : public QWidget
 public:
     explicit FileView(QString ftpHost=QString(""), QString ftpUser=QString(""), QString ftpPass=QString(""), int ftpport=21, QWidget *parent = nullptr);
     ~FileView();
-
+signals:
+    void returnToMainWindow();
 private slots:
     void on_pushButton_2_clicked();
     void on_pushButton_clicked();
     void on_pushButton_3_clicked();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
     void getFileList();
+
+    void on_addDir_clicked();
+
+    void on_removeItem_clicked();
+
+    void on_disconnectButton_clicked();
 
 private:
     Ui::FileView *ui;
@@ -35,8 +42,6 @@ private:
     ftpClient FtpClient;
     QStringList fileList;
     QString dirPath = QString();
-
-
 };
 
 #endif // FILEVIEW_H

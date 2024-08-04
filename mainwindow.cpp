@@ -40,6 +40,7 @@ void MainWindow::on_pushButton_clicked()
     line2=ui->lineEdit_2->text();
     line3=ui->lineEdit_3->text();
     line4=ui->lineEdit_4->text().toInt();
+    qDebug() << line4;
     bool valid=true;
 
     if(line1.length()==0){
@@ -71,7 +72,8 @@ void MainWindow::on_pushButton_clicked()
     }
     if(line4==0){
         valid=false;
-        ui->lineEdit_4->setPlaceholderText("Please type port");
+        ui->lineEdit_4->clear();
+        ui->lineEdit_4->setPlaceholderText("Please type valid port");
     }
     if(valid){
         ui->pushButton->setText("Connecting");
@@ -79,7 +81,12 @@ void MainWindow::on_pushButton_clicked()
         int login_Response = ftp.FTPConnect(line1, line4, line2, line3);
         if(login_Response!=-1){
             ui->pushButton->setText("Connected");
-            FileView *fileView = new FileView(line1, line2, line3, line4);
+            fileView = new FileView(line1, line2, line3, line4);
+            connect(fileView, &FileView::returnToMainWindow, this, [this]() {
+                fileView->hide();
+                delete fileView;
+                this->show();
+            });
             fileView->show();
             this->hide();
 

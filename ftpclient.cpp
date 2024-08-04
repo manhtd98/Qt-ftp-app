@@ -4,7 +4,7 @@
 #include <QRegExp>
 
 ftpClient::ftpClient() {
-
+    
 }
 
 int ftpClient::FTPConnect(QString serverIp,  int port, QString username, QString password ){
@@ -38,10 +38,6 @@ int ftpClient::FTPConnect(QString serverIp,  int port, QString username, QString
 
     // // Download a file
     // downloadFile(controlSocket, "/Users/macbook/Desktop/4.txt", "/Users/macbook/main/5.txt");
-
-
-
-
 }
 void ftpClient::sendCommand(QTcpSocket &socket, const QString &command)
 {
@@ -75,9 +71,9 @@ QPair<QStringList, QStringList> ftpClient::ListDir(QString tempDir)
     dataSocket->close();
     delete dataSocket;
 
-    QRegExp regex("^(\\S+)\\s+(\\d+)\\s+(\\S+)\\s+(\\S+)\\s+(\\d+)\\s+(\\S+\\s+\\S+\\s+\\S+)\\s+(.+)$");
+    QRegExp regex(
+        "^(\\S+)\\s+(\\d+)\\s+(\\S+)\\s+(\\S+)\\s+(\\d+)\\s+(\\S+\\s+\\S+\\s+\\S+)\\s+(.+)$");
     regex.setPatternSyntax(QRegExp::RegExp);
-
 
     QList<QString> fileList;
     QList<QString> isDirList;
@@ -88,11 +84,10 @@ QPair<QStringList, QStringList> ftpClient::ListDir(QString tempDir)
             fileName.chop(1);
             fileList.append(fileName);
             isDirList.append(line[0]);
-
         }
     }
 
-    qDebug()<<fileList;
+    qDebug() << fileList;
     return qMakePair(fileList, isDirList);
 }
 
@@ -102,10 +97,10 @@ QTcpSocket* ftpClient::openDataConnection()
     sendCommand(controlSocket, "PASV\r\n");
     QString pasvResponse = receiveResponse(controlSocket);
 
-    if(pasvResponse.startsWith("226")){
+    if (pasvResponse.startsWith("226")) {
         pasvResponse = receiveResponse(controlSocket);
         qDebug() << pasvResponse;
-    }else{
+    } else {
         qDebug() << pasvResponse;
     }
     int start = pasvResponse.indexOf('(');
@@ -121,7 +116,11 @@ QTcpSocket* ftpClient::openDataConnection()
         return nullptr;
     }
 
-    QString ip = QString("%1.%2.%3.%4").arg(addressParts[0]).arg(addressParts[1]).arg(addressParts[2]).arg(addressParts[3]);
+    QString ip = QString("%1.%2.%3.%4")
+                     .arg(addressParts[0])
+                     .arg(addressParts[1])
+                     .arg(addressParts[2])
+                     .arg(addressParts[3]);
     int port = addressParts[4].toInt() * 256 + addressParts[5].toInt();
 
     QTcpSocket *dataSocket = new QTcpSocket();
@@ -133,6 +132,33 @@ QTcpSocket* ftpClient::openDataConnection()
         return nullptr;
     }
     return dataSocket;
+}
+void ftpClient::addDir(QString tempDir)
+{
+    qDebug() << "MKD" << tempDir;
+    sendCommand(controlSocket, "MKD " + tempDir + "\r\n");
+    QString reponse = receiveResponse(controlSocket);
+    if (!reponse.startsWith("25")) {
+        qDebug() << receiveResponse(controlSocket);
+    }
+}
+void ftpClient::removeDir(QString dirPath)
+{
+    qDebug() << "RMD" << dirPath;
+    sendCommand(controlSocket, "RMD " + dirPath + "\r\n");
+    QString reponse = receiveResponse(controlSocket);
+    if (!reponse.startsWith("25")) {
+        qDebug() << receiveResponse(controlSocket);
+    }
+}
+void ftpClient::removeFile(QString filePath)
+{
+    qDebug() << "DELE" << filePath;
+    sendCommand(controlSocket, "DELE " + filePath + "\r\n");
+    QString reponse = receiveResponse(controlSocket);
+    if (!reponse.startsWith("25")) {
+        qDebug() << receiveResponse(controlSocket);
+    }
 }
 
 void ftpClient::downloadFile(const QString localFilePath, const QString remoteFilename) {
@@ -200,7 +226,6 @@ void ftpClient::uploadFile(const QString localFilePath, const QString remoteFile
             qWarning() << "Error: Write to data socket failed";
             break;
         }
-
     }
     dataSocket->waitForBytesWritten();
     inFile.close();
