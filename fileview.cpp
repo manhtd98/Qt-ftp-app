@@ -59,7 +59,7 @@ void FileView::getFileList()
     QStringList fileList=res.first;
     QStringList isDirList = res.second;
     ui->listWidget->clear();
-
+    QColor customDirColor(100, 130, 173);
     QListWidgetItem *item = new QListWidgetItem();
     item->setText("...");
     item->setSizeHint(QSize(ui->listWidget->width(), 30));
@@ -82,7 +82,7 @@ void FileView::getFileList()
                 item->setText(fileList.at(i));
                 if (isDirList.at(i) == "d") {
                     item->setIcon(dirIcon);
-                    item->setBackground(Qt::blue);
+                    item->setBackground(customDirColor);
                 } else {
                     item->setIcon(fileIcon);
                 }

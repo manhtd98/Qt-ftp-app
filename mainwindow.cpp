@@ -1,8 +1,9 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include <QtNetwork/QNetworkAccessManager>
+#include <QAction>
 #include <QNetworkReply>
 #include <QRegExp>
+#include <QtNetwork/QNetworkAccessManager>
+#include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -10,6 +11,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->lineEdit_3->setEchoMode(QLineEdit::Password);
+    ui->lineEdit->setStyleSheet("QLineEdit { padding-left: 10px; }");
+    ui->lineEdit_2->setStyleSheet("QLineEdit { padding-left: 10px; }");
+    ui->lineEdit_3->setStyleSheet("QLineEdit { padding-left: 10px; }");
+    ui->lineEdit_4->setStyleSheet("QLineEdit { padding-left: 10px; }");
 }
 
 MainWindow::~MainWindow()

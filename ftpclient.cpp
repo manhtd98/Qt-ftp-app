@@ -76,7 +76,7 @@ QPair<QStringList, QStringList> ftpClient::ListDir(QString tempDir)
     dataSocket->close();
     delete dataSocket;
 
-    QRegExp regex(
+    static QRegExp regex(
         "^(\\S+)\\s+(\\d+)\\s+(\\S+)\\s+(\\S+)\\s+(\\d+)\\s+(\\S+\\s+\\S+\\s+\\S+)\\s+(.+)$");
     regex.setPatternSyntax(QRegExp::RegExp);
 
