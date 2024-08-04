@@ -23,11 +23,12 @@ int ftpClient::FTPConnect(QString serverIp,  int port, QString username, QString
 
     qDebug() << "Sending username...";
     sendCommand(controlSocket, "USER " + username + "\r\n");
-    qDebug() << receiveResponse(controlSocket);
-
+    QString response = receiveResponse(controlSocket);
+    qDebug() << response;
+    if (response.startsWith("220")) {
+        qDebug() << receiveResponse(controlSocket);
+    }
     qDebug() << "Sending password...";
-
-    qDebug() << receiveResponse(controlSocket);
     sendCommand(controlSocket, "PASS " + password + "\r\n");
     QString loginResponse = receiveResponse(controlSocket);
     qDebug()<< loginResponse;
