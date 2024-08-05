@@ -46,7 +46,6 @@ void MainWindow::on_pushButton_clicked()
     line2=ui->lineEdit_2->text();
     line3=ui->lineEdit_3->text();
     line4=ui->lineEdit_4->text().toInt();
-    qDebug() << line4;
     bool valid=true;
 
     if(line1.length()==0){
@@ -99,6 +98,8 @@ void MainWindow::on_pushButton_clicked()
         }else{
             ui->pushButton->setText("Failed");
         }
+    } else {
+        ui->pushButton->setText("Connect");
     }
 }
 

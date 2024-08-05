@@ -58,7 +58,6 @@ void FileView::getFileList()
     QStringList fileList=res.first;
     QStringList isDirList = res.second;
     ui->listWidget->clear();
-    qDebug() << dirPath.split("/").size();
     if (dirPath.split("/").size() > 1) {
         // Add the ... to return previous folder
         QListWidgetItem *item = new QListWidgetItem();
