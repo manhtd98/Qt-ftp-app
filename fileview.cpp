@@ -160,7 +160,12 @@ void FileView::on_addDir_clicked()
                                          "",
                                          &ok);
     if (ok && !text.isEmpty()) {
-        FtpClient.addDir(dirPath + "/" + text);
+        int response = FtpClient.addDir(dirPath + "/" + text);
+        if (response == -1) {
+            QMessageBox::information(nullptr,
+                                     "Add directory failed",
+                                     "Permission Denied or Not valid name");
+        }
     }
     getFileList();
 }
