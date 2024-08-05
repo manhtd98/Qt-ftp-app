@@ -25,9 +25,10 @@ FileView::FileView(QString ftpHost, QString ftpUser, QString ftpPass, int ftppor
     ui->listWidget->clear();
 
     qDebug() << "Connecting to" << ftpAddress << ftpPort << username << password;
-    FtpClient.FTPConnect(ftpAddress, ftpPort, username, password);
-
-    getFileList();
+    int response = FtpClient.FTPConnect(ftpAddress, ftpPort, username, password);
+    if (response != -1) {
+        getFileList();
+    }
 }
 
 FileView::~FileView()

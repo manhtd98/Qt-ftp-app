@@ -15,7 +15,7 @@ int ftpClient::FTPConnect(QString serverIp,  int port, QString username, QString
     controlSocket.connectToHost(serverIp, port);
     if (!controlSocket.waitForConnected()) {
         qWarning() << "Error: Unable to connect to server";
-        return 1;
+        return -1;
     }
 
     qDebug() << "Connected to server. Receiving welcome message...";
