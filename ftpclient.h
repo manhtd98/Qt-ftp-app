@@ -22,9 +22,10 @@ public:
     void downloadFile(const QString localFilePath, const QString remoteFileName);
     void uploadFile(const QString localFilePath, const QString remoteFileName);
     QPair<QStringList, QStringList> ListDir(QString tempDir);
-    void addDir(QString tempDir);
-    void removeDir(QString dirPath);
-    void removeFile(QString filePath);
+    int addDir(QString tempDir);
+    int removeDir(QString dirPath);
+    int removeFile(QString filePath);
+    int removeDirRecursive(QString dirPath);
 
 private:
     QString server_addr;

@@ -39,17 +39,12 @@ void FileView::on_pushButton_2_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Upload file", NULL);
     ui->lineEdit->setText(filename);
-}
-
-void FileView::on_pushButton_clicked()
-{
     // Choost upload file path
-    QFile* file = new QFile(ui->lineEdit->text());
-    qDebug()<< "Open file:" << ui->lineEdit->text();
+    QFile *file = new QFile(ui->lineEdit->text());
+    qDebug() << "Open file:" << ui->lineEdit->text();
     QFileInfo fileInfo(*file);
     QString uploadFileName = fileInfo.fileName();
-    if (file->open(QIODevice::ReadOnly))
-    {
+    if (file->open(QIODevice::ReadOnly)) {
         FtpClient.uploadFile(fileInfo.filePath(), dirPath + "/" + uploadFileName);
         getFileList();
     }
@@ -176,10 +171,19 @@ void FileView::on_removeItem_clicked()
     if (selectedItem.size() > 0) {
         for (int i = 0; i < selectedItem.size(); i++) {
             if (selectedItem.at(i)->data(Qt::UserRole) == "d") {
-                FtpClient.removeDir(dirPath + "/" + selectedItem.at(i)->text());
+                int removeCode = FtpClient.removeDirRecursive(dirPath + "/"
+                                                              + selectedItem.at(i)->text());
+                if (removeCode == -1) {
+                    QMessageBox::information(nullptr,
+                                             "Remove folder failed",
+                                             "Permission Denied or Directory not empty");
+                }
 
             } else {
-                FtpClient.removeFile(dirPath + "/" + selectedItem.at(i)->text());
+                int removeCode = FtpClient.removeFile(dirPath + "/" + selectedItem.at(i)->text());
+                if (removeCode == -1) {
+                    QMessageBox::information(nullptr, "Remove file failed", "Permission Denied");
+                }
             }
         }
         getFileList();

@@ -138,25 +138,62 @@ QTcpSocket* ftpClient::openDataConnection()
     }
     return dataSocket;
 }
-void ftpClient::addDir(QString tempDir)
+int ftpClient::addDir(QString tempDir)
 {
     qDebug() << "MKD" << tempDir;
     sendCommand(controlSocket, "MKD " + tempDir + "\r\n");
-    QString reponse = receiveResponse(controlSocket);
-    if (!reponse.startsWith("25")) {
-        qDebug() << receiveResponse(controlSocket);
+    QString response = receiveResponse(controlSocket);
+    qDebug() << response;
+    if (!response.startsWith("25")) {
+        response = receiveResponse(controlSocket);
+        qDebug() << response;
+        if (!response.startsWith("2")) {
+            return -1;
+        }
     }
+    return 1;
 }
-void ftpClient::removeDir(QString dirPath)
+int ftpClient::removeDir(QString dirPath)
 {
     qDebug() << "RMD" << dirPath;
     sendCommand(controlSocket, "RMD " + dirPath + "\r\n");
-    QString reponse = receiveResponse(controlSocket);
-    if (!reponse.startsWith("25")) {
-        qDebug() << receiveResponse(controlSocket);
+    QString response = receiveResponse(controlSocket);
+    qDebug() << response;
+    if (!response.startsWith("25")) {
+        response = receiveResponse(controlSocket);
+        qDebug() << response;
+        if (!response.startsWith("2")) {
+            return -1;
+        }
     }
+    return 1;
 }
-void ftpClient::removeFile(QString filePath)
+int ftpClient::removeDirRecursive(QString dirPath)
+{
+    qDebug() << "Removing directory recursively:" << dirPath;
+
+    // List all files and directories inside the directory
+    QPair<QStringList, QStringList> dirContents = ListDir(dirPath);
+    QStringList fileList = dirContents.first;
+    QStringList isDirList = dirContents.second;
+    // Remove all files
+    // for (int i = 0; i < fileList.size(); ++i) {
+    //     QString item = fileList[i];
+    //     if (isDirList[i] == 'd') {
+    //         // It's a directory, call removeDirRecursive
+    //         removeDirRecursive(dirPath + "/" + item);
+    //     } else {
+    //         // It's a file, delete it
+    //         removeFile(dirPath + "/" + item);
+    //     }
+    // }
+    if (fileList.size() > 0) {
+        return -1;
+    }
+    return removeDir(dirPath);
+}
+
+int ftpClient::removeFile(QString filePath)
 {
     qDebug() << "DELE" << filePath;
     sendCommand(controlSocket, "DELE " + filePath + "\r\n");
@@ -226,7 +263,7 @@ void ftpClient::uploadFile(const QString localFilePath, const QString remoteFile
     while (!inFile.atEnd()) {
         QByteArray buffer = inFile.read(1024);
         qint64 bytesWritten = dataSocket->write(buffer);
-        qDebug()<<bytesWritten;
+        qDebug() << bytesWritten;
         if (bytesWritten == -1) {
             qWarning() << "Error: Write to data socket failed";
             break;
