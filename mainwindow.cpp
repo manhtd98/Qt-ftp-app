@@ -76,7 +76,7 @@ void MainWindow::on_pushButton_clicked()
         valid=false;
         ui->lineEdit_3->setPlaceholderText("Please type valid password");
     }
-    if(line4==0){
+    if((line4<= 0) or (line4 > 65535)){
         valid=false;
         ui->lineEdit_4->clear();
         ui->lineEdit_4->setPlaceholderText("Please type valid port");
