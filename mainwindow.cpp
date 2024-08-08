@@ -91,6 +91,7 @@ void MainWindow::on_pushButton_clicked()
                 fileView->hide();
                 delete fileView;
                 this->show();
+                ui->pushButton->setText("Connect");
             });
             fileView->show();
             this->hide();
