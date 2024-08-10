@@ -1,7 +1,8 @@
 #include "ftpclient.h"
-#include <QTcpSocket>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QRegExp>
+#include <QTcpSocket>
 
 ftpClient::ftpClient() {
     
@@ -19,19 +20,17 @@ int ftpClient::FTPConnect(QString serverIp,  int port, QString username, QString
     }
 
     qDebug() << "Connected to server. Receiving welcome message...";
-    qDebug() << receiveResponse(controlSocket);
+    receiveResponse(controlSocket);
 
     qDebug() << "Sending username...";
     sendCommand(controlSocket, "USER " + username + "\r\n");
     QString response = receiveResponse(controlSocket);
-    qDebug() << response;
     if (response.startsWith("220")) {
         qDebug() << receiveResponse(controlSocket);
     }
     qDebug() << "Sending password...";
     sendCommand(controlSocket, "PASS " + password + "\r\n");
     QString loginResponse = receiveResponse(controlSocket);
-    qDebug()<< loginResponse;
     if(loginResponse.contains("230")){
         return 1;
     }
@@ -54,11 +53,15 @@ QString ftpClient::receiveResponse(QTcpSocket &socket) {
     while (!socket.canReadLine()) {
         socket.waitForReadyRead();
     }
-    return QString::fromUtf8(socket.readLine());
+    QString response = QString::fromUtf8(socket.readLine());
+    qDebug() << response;
+    return response;
 }
 
 QPair<QStringList, QStringList> ftpClient::ListDir(QString tempDir)
 {
+    QElapsedTimer timer;
+    timer.start();
     QTcpSocket * dataSocket = openDataConnection();
     if (!dataSocket) {
         return qMakePair(QStringList(), QStringList());
@@ -66,7 +69,7 @@ QPair<QStringList, QStringList> ftpClient::ListDir(QString tempDir)
 
     qDebug() << "Sending LIST command..." << tempDir;
     sendCommand(controlSocket, "LIST "+ tempDir + "\r\n");
-    qDebug() << receiveResponse(controlSocket);
+    receiveResponse(controlSocket);
 
     QString dirListing;
     qDebug() << "Receiving directory listing...";
@@ -91,22 +94,20 @@ QPair<QStringList, QStringList> ftpClient::ListDir(QString tempDir)
             isDirList.append(line[0]);
         }
     }
-
-    qDebug() << fileList;
+    qDebug() << "Function took" << timer.elapsed() << "ms";
     return qMakePair(fileList, isDirList);
 }
 
 QTcpSocket* ftpClient::openDataConnection()
 {
+    QElapsedTimer timer;
+    timer.start();
     qDebug()<<"Entering PASV mode";
     sendCommand(controlSocket, "PASV\r\n");
     QString pasvResponse = receiveResponse(controlSocket);
 
     if (pasvResponse.startsWith("226")) {
         pasvResponse = receiveResponse(controlSocket);
-        qDebug() << pasvResponse;
-    } else {
-        qDebug() << pasvResponse;
     }
     int start = pasvResponse.indexOf('(');
     int end = pasvResponse.indexOf(')');
@@ -121,11 +122,7 @@ QTcpSocket* ftpClient::openDataConnection()
         return nullptr;
     }
 
-    QString ip = QString("%1.%2.%3.%4")
-                     .arg(addressParts[0])
-                     .arg(addressParts[1])
-                     .arg(addressParts[2])
-                     .arg(addressParts[3]);
+    QString ip = QString("%1.%2.%3.%4").arg(addressParts[0], addressParts[1], addressParts[2], addressParts[3]);
     int port = addressParts[4].toInt() * 256 + addressParts[5].toInt();
 
     QTcpSocket *dataSocket = new QTcpSocket();
@@ -136,17 +133,22 @@ QTcpSocket* ftpClient::openDataConnection()
         delete dataSocket;
         return nullptr;
     }
+    qDebug() << "Function took" << timer.elapsed() << "ms";
     return dataSocket;
 }
 int ftpClient::addDir(QString tempDir)
 {
+    QElapsedTimer timer;
+    timer.start();
     qDebug() << "MKD" << tempDir;
     sendCommand(controlSocket, "MKD " + tempDir + "\r\n");
     QString response = receiveResponse(controlSocket);
-    qDebug() << response;
+    qDebug() << "Function took" << timer.elapsed() << "ms";
+    if (response.startsWith("550")) {
+        return -1;
+    };
     if (!response.startsWith("25")) {
         response = receiveResponse(controlSocket);
-        qDebug() << response;
         if (!response.startsWith("2")) {
             return -1;
         }
@@ -155,10 +157,15 @@ int ftpClient::addDir(QString tempDir)
 }
 int ftpClient::removeDir(QString dirPath)
 {
+    QElapsedTimer timer;
+    timer.start();
     qDebug() << "RMD" << dirPath;
     sendCommand(controlSocket, "RMD " + dirPath + "\r\n");
     QString response = receiveResponse(controlSocket);
-    qDebug() << response;
+    qDebug() << "Function took" << timer.elapsed() << "ms";
+    if (response.startsWith("550")) {
+        return -1;
+    };
     if (!response.startsWith("25")) {
         response = receiveResponse(controlSocket);
         qDebug() << response;
@@ -170,6 +177,8 @@ int ftpClient::removeDir(QString dirPath)
 }
 int ftpClient::removeDirRecursive(QString dirPath)
 {
+    QElapsedTimer timer;
+    timer.start();
     qDebug() << "Removing directory recursively:" << dirPath;
 
     // List all files and directories inside the directory
@@ -187,23 +196,38 @@ int ftpClient::removeDirRecursive(QString dirPath)
     //         removeFile(dirPath + "/" + item);
     //     }
     // }
+    qDebug() << "Function took" << timer.elapsed() << "ms";
     if (fileList.size() > 0) {
         return -1;
     }
+
     return removeDir(dirPath);
 }
 
 int ftpClient::removeFile(QString filePath)
 {
+    QElapsedTimer timer;
+    timer.start();
     qDebug() << "DELE" << filePath;
     sendCommand(controlSocket, "DELE " + filePath + "\r\n");
-    QString reponse = receiveResponse(controlSocket);
-    if (!reponse.startsWith("25")) {
-        qDebug() << receiveResponse(controlSocket);
+    QString response = receiveResponse(controlSocket);
+    qDebug() << "Function took" << timer.elapsed() << "ms";
+    if (response.startsWith("550")) {
+        return -1;
+    };
+
+    if (!response.startsWith("25")) {
+        response = receiveResponse(controlSocket);
+        if (!response.startsWith("25")) {
+            return -1;
+        }
     }
+    return 1;
 }
 
 void ftpClient::downloadFile(const QString localFilePath, const QString remoteFilename) {
+    QElapsedTimer timer;
+    timer.start();
     QTcpSocket *dataSocket = openDataConnection();
     if (!dataSocket) {
         return;
@@ -211,7 +235,7 @@ void ftpClient::downloadFile(const QString localFilePath, const QString remoteFi
 
     qDebug() << "Sending RETR command for file" << remoteFilename << "to" << localFilePath;
     sendCommand(controlSocket, "RETR " + remoteFilename + "\r\n");
-    qDebug() << receiveResponse(controlSocket);
+    receiveResponse(controlSocket);
 
     qDebug() << "Receiving file...";
     QFile outFile(localFilePath);
@@ -221,14 +245,17 @@ void ftpClient::downloadFile(const QString localFilePath, const QString remoteFi
     }
     outFile.close();
 
-    qDebug() << receiveResponse(controlSocket);
+    receiveResponse(controlSocket);
 
     dataSocket->close();
     delete dataSocket;
+    qDebug() << "Function took" << timer.elapsed() << "ms";
 }
 
 void ftpClient::uploadFile(const QString localFilePath, const QString remoteFileName)
 {
+    QElapsedTimer timer;
+    timer.start();
     QTcpSocket *dataSocket = openDataConnection();
     if (!dataSocket) {
         return ;
@@ -238,7 +265,6 @@ void ftpClient::uploadFile(const QString localFilePath, const QString remoteFile
     qDebug() << "Sending STOR command for file" << localFilePath  << "to" << remoteFileName;
     sendCommand(controlSocket, "STOR " + remoteFileName + "\r\n");
     QString response = receiveResponse(controlSocket);
-    qDebug() << response;
     if (!response.startsWith("150")) {
         qDebug() << "Error: Unexpected response to STOR command";
         dataSocket->close();
@@ -263,7 +289,6 @@ void ftpClient::uploadFile(const QString localFilePath, const QString remoteFile
     while (!inFile.atEnd()) {
         QByteArray buffer = inFile.read(1024);
         qint64 bytesWritten = dataSocket->write(buffer);
-        qDebug() << bytesWritten;
         if (bytesWritten == -1) {
             qWarning() << "Error: Write to data socket failed";
             break;
@@ -273,4 +298,5 @@ void ftpClient::uploadFile(const QString localFilePath, const QString remoteFile
     inFile.close();
     dataSocket->close();
     delete dataSocket;
+    qDebug() << "Function took" << timer.elapsed() << "ms";
 }

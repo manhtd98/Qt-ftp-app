@@ -135,6 +135,7 @@ void FileView::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 
 void FileView::on_pushButton_3_clicked()
 {
+    qDebug() << "Choose download folder clicked";
     QString directory = QFileDialog::getExistingDirectory(
         nullptr,
         "Choose download",
@@ -152,6 +153,7 @@ void FileView::on_pushButton_3_clicked()
 
 void FileView::on_addDir_clicked()
 {
+    qDebug() << "Add directory clicked";
     bool ok;
     QString text = QInputDialog::getText(this,
                                          tr("Type directory name"),
@@ -172,6 +174,7 @@ void FileView::on_addDir_clicked()
 
 void FileView::on_removeItem_clicked()
 {
+    qDebug() << "Remove item clicked";
     QList<QListWidgetItem *> selectedItem = ui->listWidget->selectedItems();
     if (selectedItem.size() > 0) {
         for (int i = 0; i < selectedItem.size(); i++) {
@@ -201,5 +204,6 @@ void FileView::on_removeItem_clicked()
 
 void FileView::on_disconnectButton_clicked()
 {
+    qDebug() << "Disconnect to server";
     emit returnToMainWindow();
 }

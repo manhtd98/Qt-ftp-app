@@ -4,8 +4,14 @@
 
 #include "ftpclient.h"
 
+void setupMessagePattern()
+{
+    qSetMessagePattern("[%{time hh:mm:ss.zzz}] [%{type}] [%{file}:%{line}] %{message}");
+}
+
 int main(int argc, char *argv[])
 {
+    setupMessagePattern();
     QApplication a(argc, argv);
     MainWindow w;
     w.setWindowTitle("FTP Client");
