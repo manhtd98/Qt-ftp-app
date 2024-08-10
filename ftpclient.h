@@ -19,8 +19,8 @@ public:
     int FTPConnect(QString serverIp,  int port, QString username, QString password );
     QString receiveResponse(QTcpSocket &socket);
     QTcpSocket* openDataConnection();
-    void downloadFile(const QString localFilePath, const QString remoteFileName);
-    void uploadFile(const QString localFilePath, const QString remoteFileName);
+    int downloadFile(const QString localFilePath, const QString remoteFileName);
+    int uploadFile(const QString localFilePath, const QString remoteFileName);
     QPair<QStringList, QStringList> ListDir(QString tempDir);
     int addDir(QString tempDir);
     int removeDir(QString dirPath);

@@ -46,8 +46,12 @@ void FileView::on_pushButton_2_clicked()
     QFileInfo fileInfo(*file);
     QString uploadFileName = fileInfo.fileName();
     if (file->open(QIODevice::ReadOnly)) {
-        FtpClient.uploadFile(fileInfo.filePath(), dirPath + "/" + uploadFileName);
-        getFileList();
+        int response = FtpClient.uploadFile(fileInfo.filePath(), dirPath + "/" + uploadFileName);
+        if (response != -1) {
+            getFileList();
+        } else {
+            qDebug() << "Failed to upload";
+        }
     }
 }
 
@@ -121,12 +125,13 @@ void FileView::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
                     );
             }else{
                 QString downloadfilePath = dirPath + "/" + item->text();
-                FtpClient.downloadFile(downloadPath+ "/" + item->text(), downloadfilePath);
-                QMessageBox::information(
-                    nullptr,
-                    "Success download",
-                    "Success download file"
-                    );
+                int response = FtpClient.downloadFile(downloadPath + "/" + item->text(),
+                                                      downloadfilePath);
+                if (response != -1) {
+                    QMessageBox::information(nullptr, "Success download", "Success download file");
+                } else {
+                    QMessageBox::information(nullptr, "Failed download", "Failed download file");
+                }
             }
         }
     }

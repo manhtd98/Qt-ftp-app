@@ -225,12 +225,13 @@ int ftpClient::removeFile(QString filePath)
     return 1;
 }
 
-void ftpClient::downloadFile(const QString localFilePath, const QString remoteFilename) {
+int ftpClient::downloadFile(const QString localFilePath, const QString remoteFilename)
+{
     QElapsedTimer timer;
     timer.start();
     QTcpSocket *dataSocket = openDataConnection();
     if (!dataSocket) {
-        return;
+        return -1;
     }
 
     qDebug() << "Sending RETR command for file" << remoteFilename << "to" << localFilePath;
@@ -250,15 +251,16 @@ void ftpClient::downloadFile(const QString localFilePath, const QString remoteFi
     dataSocket->close();
     delete dataSocket;
     qDebug() << "Function took" << timer.elapsed() << "ms";
+    return 1;
 }
 
-void ftpClient::uploadFile(const QString localFilePath, const QString remoteFileName)
+int ftpClient::uploadFile(const QString localFilePath, const QString remoteFileName)
 {
     QElapsedTimer timer;
     timer.start();
     QTcpSocket *dataSocket = openDataConnection();
     if (!dataSocket) {
-        return ;
+        return -1;
     }
 
     qDebug() << "Upload file start...";
@@ -299,4 +301,5 @@ void ftpClient::uploadFile(const QString localFilePath, const QString remoteFile
     dataSocket->close();
     delete dataSocket;
     qDebug() << "Function took" << timer.elapsed() << "ms";
+    return 1;
 }
