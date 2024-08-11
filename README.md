@@ -13,7 +13,7 @@ Qt 5.15 or later
 - QFile: File transfer
 
 ### UML
-[chart](mermaid-flow.png)
+![chart](mermaid-flow.png)
 ### Features
 #### Connect to FTP Server
 - Enter FTP server details (server address, username, password) in MainWindow.
