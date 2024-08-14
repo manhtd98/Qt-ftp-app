@@ -49,7 +49,8 @@ void ftpClient::sendCommand(QTcpSocket &socket, const QString &command)
     socket.flush();
 }
 
-QString ftpClient::receiveResponse(QTcpSocket &socket) {
+QString ftpClient::receiveResponse(QTcpSocket &socket)
+{
     while (!socket.canReadLine()) {
         socket.waitForReadyRead();
     }
@@ -271,13 +272,13 @@ int ftpClient::uploadFile(const QString localFilePath, const QString remoteFileN
         qDebug() << "Error: Unexpected response to STOR command";
         dataSocket->close();
         delete dataSocket;
-        return;
+        return -1;
     }
     if (dataSocket->state() != QAbstractSocket::ConnectedState) {
         qDebug() << "Error: Data socket not connected";
         dataSocket->close();
         delete dataSocket;
-        return;
+        return -1;
     }
 
     qDebug() << "Uploading file...";
@@ -286,7 +287,7 @@ int ftpClient::uploadFile(const QString localFilePath, const QString remoteFileN
         qWarning() << "Error: Unable to open file for reading";
         dataSocket->close();
         delete dataSocket;
-        return;
+        return -1;
     }
     while (!inFile.atEnd()) {
         QByteArray buffer = inFile.read(1024);
