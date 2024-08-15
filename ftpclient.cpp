@@ -14,7 +14,7 @@ ftpClient::~ftpClient()
 
 int ftpClient::FTPConnect(QString serverIp,  int port, QString username, QString password ){
     controlSocket.connectToHost(serverIp, port);
-    if (!controlSocket.waitForConnected()) {
+    if (!controlSocket.waitForConnected(10000)) {
         qWarning() << "Error: Unable to connect to server";
         return -1;
     }
@@ -52,7 +52,7 @@ void ftpClient::sendCommand(QTcpSocket &socket, const QString &command)
 QString ftpClient::receiveResponse(QTcpSocket &socket)
 {
     while (!socket.canReadLine()) {
-        socket.waitForReadyRead();
+        socket.waitForReadyRead(10000);
     }
     QString response = QString::fromUtf8(socket.readLine());
     qDebug() << response;
@@ -88,6 +88,7 @@ QPair<QStringList, QStringList> ftpClient::ListDir(QString tempDir)
     QList<QString> isDirList;
     QStringList lines = dirListing.split("\n", QString::SkipEmptyParts);
     foreach (const QString &line, lines) {
+        qDebug() << line;
         if (regex.indexIn(line) != -1) {
             QString fileName = regex.cap(7);
             fileName.chop(1);
